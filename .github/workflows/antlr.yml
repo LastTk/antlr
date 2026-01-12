@@ -1,4 +1,4 @@
-name: Generate ANTLR Lexer Only
+name: Generate ANTLR Lexers Only
 
 on:
   workflow_dispatch:
@@ -20,21 +20,38 @@ jobs:
         run: |
           curl -L -o antlr-4.13.1-complete.jar https://www.antlr.org/download/antlr-4.13.1-complete.jar
 
-      # 3️⃣ Clone grammars-v4 repo
+      # 3️⃣ Clone ANTLR grammars-v4
       - name: Clone ANTLR grammars-v4
         run: |
           git clone https://github.com/antlr/grammars-v4.git
 
-      # 4️⃣ Create output folder
+      # 4️⃣ Prepare output folder
       - name: Prepare output folder
         run: mkdir -p out
 
-      # 5️⃣ Generate Java for all lexer grammars only
+      # 5️⃣ Generate Java lexers only
       - name: Generate Java lexers
         run: |
-          # Find only Lexer grammars
-          find grammars-v4 -name "*Lexer.g4" | while read g4file; do
-            echo "Generating lexer for $g4file"
+          mkdir -p out
+          # Use find + xargs to handle spaces safely
+          find grammars-v4 -name "*Lexer.g4" -print0 | \
+          xargs -0 -n1 -I{} java -jar antlr-4.13.1-complete.jar "{}" \
+            -Dlanguage=Java \
+            -package com.example.antlr \
+            -o out
+
+      # 6️⃣ Zip all generated lexer files
+      - name: Zip generated lexers
+        run: |
+          cd out
+          zip -r ../antlr-lexers.zip .
+
+      # 7️⃣ Upload artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: antlr-lexers
+          path: antlr-lexers.zip            echo "Generating lexer for $g4file"
             java -jar antlr-4.13.1-complete.jar \
               "$g4file" \
               -Dlanguage=Java \
