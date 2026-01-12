@@ -27,7 +27,7 @@ jobs:
       - name: Generate Java lexer
         run: |
           java -jar antlr.jar \
-            antlr/SimpleCppLexer.g4 \
+            antlr/CPP14Lexer.g4 \
             -Dlanguage=Java \
             -package com.example.antlr \
             -o app/src/main/java/com/example/antlr
