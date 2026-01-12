@@ -29,12 +29,25 @@ jobs:
       - name: Prepare output folder
         run: mkdir -p out
 
-      # 5️⃣ Generate Java lexers only
+      # 5️⃣ Generate Java lexers only (safe for spaces)
       - name: Generate Java lexers
         run: |
           mkdir -p out
-          # Use find + xargs to handle spaces safely
           find grammars-v4 -name "*Lexer.g4" -print0 | \
+          xargs -0 -n1 -I{} sh -c 'java -jar antlr-4.13.1-complete.jar "$1" -Dlanguage=Java -package com.example.antlr -o out' _ {}
+
+      # 6️⃣ Zip all generated lexer files
+      - name: Zip generated lexers
+        run: |
+          cd out
+          zip -r ../antlr-lexers.zip .
+
+      # 7️⃣ Upload artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: antlr-lexers
+          path: antlr-lexers.zip          find grammars-v4 -name "*Lexer.g4" -print0 | \
           xargs -0 -n1 -I{} java -jar antlr-4.13.1-complete.jar "{}" \
             -Dlanguage=Java \
             -package com.example.antlr \
