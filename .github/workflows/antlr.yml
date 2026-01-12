@@ -27,8 +27,8 @@ jobs:
       # 4️⃣ Download CPP14Lexer.g4 and CPP14Parser.g4 from GitHub
       - name: Download .g4 files
         run: |
-          curl -L -o antlr/CPP14Lexer.g4 https://raw.githubusercontent.com/<USERNAME>/<REPO>/main/antlr/CPP14Lexer.g4
-          curl -L -o antlr/CPP14Parser.g4 https://raw.githubusercontent.com/<USERNAME>/<REPO>/main/antlr/CPP14Parser.g4
+          curl -L -o antlr/CPP14Lexer.g4 https://raw.githubusercontent.com/antlr/grammars-v4/refs/heads/master/cpp/CPP14Lexer.g4
+          curl -L -o antlr/CPP14Parser.g4 https://raw.githubusercontent.com/antlr/grammars-v4/refs/heads/master/cpp/CPP14Parser.g4
 
       # 5️⃣ Generate Java lexer + parser
       - name: Generate Java lexer & parser
