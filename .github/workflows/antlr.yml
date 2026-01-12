@@ -26,16 +26,20 @@ jobs:
 
       - name: Generate Java lexer
         run: |
+          mkdir -p out
           java -jar antlr.jar \
             antlr/CPP14Lexer.g4 \
             -Dlanguage=Java \
             -package com.example.antlr \
-            -o app/src/main/java/com/example/antlr
+            -o out
 
-      - name: Commit generated files
+      - name: Zip generated files
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add app/src/main/java/com/example/antlr
-          git commit -m "Generate ANTLR lexer" || echo "No changes"
-          git push
+          cd out
+          zip -r ../antlr-generated.zip .
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: antlr-generated
+          path: antlr-generated.zip
