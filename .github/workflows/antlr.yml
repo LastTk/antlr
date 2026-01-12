@@ -27,14 +27,14 @@ jobs:
       # 4️⃣ Download only CPP14Lexer.g4
       - name: Download lexer grammar
         run: |
-          curl -L -o antlr/CPP14Lexer.g4 https://raw.githubusercontent.com/LastTk/antlr/refs/heads/main/antlr/GroovyLexer.g4
+          curl -L -o antlr/GroovyLexer.g4 https://raw.githubusercontent.com/LastTk/antlr/refs/heads/main/antlr/GroovyLexer.g4
 
       # 5️⃣ Generate Java lexer only
       - name: Generate Lexer
         run: |
           mkdir -p out
           java -jar antlr-4.13.1-complete.jar \
-            antlr/CPP14Lexer.g4 \
+            antlr/GroovyLexer.g4 \
             -Dlanguage=Java \
             -package com.example.antlr \
             -o out
