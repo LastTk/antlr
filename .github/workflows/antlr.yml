@@ -1,0 +1,41 @@
+name: Generate ANTLR Lexer
+
+on:
+  push:
+    paths:
+      - "antlr/**.g4"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Download ANTLR
+        run: |
+          curl -L -o antlr.jar https://www.antlr.org/download/antlr-4.13.1-complete.jar
+
+      - name: Generate Java lexer
+        run: |
+          java -jar antlr.jar \
+            antlr/SimpleCppLexer.g4 \
+            -Dlanguage=Java \
+            -package com.example.antlr \
+            -o app/src/main/java/com/example/antlr
+
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add app/src/main/java/com/example/antlr
+          git commit -m "Generate ANTLR lexer" || echo "No changes"
+          git push
