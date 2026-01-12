@@ -1,4 +1,4 @@
-name: Generate ANTLR Lexers Only
+name: Generate ANTLR Lexer
 
 on:
   workflow_dispatch:
@@ -20,89 +20,21 @@ jobs:
         run: |
           curl -L -o antlr-4.13.1-complete.jar https://www.antlr.org/download/antlr-4.13.1-complete.jar
 
-      # 3️⃣ Clone ANTLR grammars-v4
-      - name: Clone ANTLR grammars-v4
+      # 3️⃣ Create grammar folder
+      - name: Prepare grammar folder
+        run: mkdir -p antlr
+
+      # 4️⃣ Download only CPP14Lexer.g4
+      - name: Download lexer grammar
         run: |
-          git clone https://github.com/antlr/grammars-v4.git
+          curl -L -o antlr/CPP14Lexer.g4 https://raw.githubusercontent.com/LastTk/antlr/refs/heads/main/antlr/GroovyLexer.g4
 
-      # 4️⃣ Prepare output folder
-      - name: Prepare output folder
-        run: mkdir -p out
-
-      # 5️⃣ Generate Java lexers only (safe for spaces)
-      - name: Generate Java lexers
+      # 5️⃣ Generate Java lexer only
+      - name: Generate Lexer
         run: |
           mkdir -p out
-          find grammars-v4 -name "*Lexer.g4" -print0 | \
-          xargs -0 -n1 -I{} sh -c 'java -jar antlr-4.13.1-complete.jar "$1" -Dlanguage=Java -package com.example.antlr -o out' _ {}
-
-      # 6️⃣ Zip all generated lexer files
-      - name: Zip generated lexers
-        run: |
-          cd out
-          zip -r ../antlr-lexers.zip .
-
-      # 7️⃣ Upload artifact
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: antlr-lexers
-          path: antlr-lexers.zip          find grammars-v4 -name "*Lexer.g4" -print0 | \
-          xargs -0 -n1 -I{} java -jar antlr-4.13.1-complete.jar "{}" \
-            -Dlanguage=Java \
-            -package com.example.antlr \
-            -o out
-
-      # 6️⃣ Zip all generated lexer files
-      - name: Zip generated lexers
-        run: |
-          cd out
-          zip -r ../antlr-lexers.zip .
-
-      # 7️⃣ Upload artifact
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: antlr-lexers
-          path: antlr-lexers.zip            echo "Generating lexer for $g4file"
-            java -jar antlr-4.13.1-complete.jar \
-              "$g4file" \
-              -Dlanguage=Java \
-              -package com.example.antlr \
-              -o out
-          done
-
-      # 6️⃣ Zip all generated lexer files
-      - name: Zip generated files
-        run: |
-          cd out
-          zip -r ../antlr-lexers.zip .
-
-      # 7️⃣ Upload artifact
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: antlr-lexers
-          path: antlr-lexers.zip            java -jar antlr-4.13.1-complete.jar \
-              "$g4file" \
-              -Dlanguage=Java \
-              -visitor \
-              -package com.example.antlr \
-              -o out
-          done
-
-      # 6️⃣ Zip all generated files
-      - name: Zip generated files
-        run: |
-          cd out
-          zip -r ../antlr-generated.zip .
-
-      # 7️⃣ Upload artifact
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: antlr-generated
-          path: antlr-generated.zip            antlr/CPP14Lexer.g4 \
+          java -jar antlr-4.13.1-complete.jar \
+            antlr/CPP14Lexer.g4 \
             -Dlanguage=Java \
             -package com.example.antlr \
             -o out
