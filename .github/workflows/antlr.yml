@@ -11,33 +11,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # 2️⃣ Setup Java (v17)
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Download ANTLR
+      # 3️⃣ Download ANTLR 4
+      - name: Download ANTLR 4
         run: |
-          curl -L -o antlr.jar https://www.antlr.org/download/antlr-4.13.1-complete.jar
+          curl -L -o antlr-4.13.1-complete.jar https://www.antlr.org/download/antlr-4.13.1-complete.jar
 
-      - name: Generate Java lexer
+      # 4️⃣ Generate lexer + parser for Java
+      - name: Generate Java lexer/parser
         run: |
           mkdir -p out
-          java -jar antlr.jar \
+          java -jar antlr-4.13.1-complete.jar \
             antlr/CPP14Lexer.g4 \
+            antlr/CPP14Parser.g4 \
             -Dlanguage=Java \
+            -visitor \
             -package com.example.antlr \
             -o out
 
+      # 5️⃣ Zip output for download
       - name: Zip generated files
         run: |
           cd out
           zip -r ../antlr-generated.zip .
 
+      # 6️⃣ Upload as artifact
       - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
